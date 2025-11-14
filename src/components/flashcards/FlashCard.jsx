@@ -1,39 +1,61 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 export default function FlashCard({ card, state, onClick }) {
   const { flipped, enlarged, completed } = state;
+  const audioRef = useRef(null);
+
+  // Riproduci audio quando la carta si gira (prima volta)
+  useEffect(() => {
+    if (flipped && !state.flippedPrev && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
+  }, [flipped, state.flippedPrev]);
+
+  // Passa lo stato precedente per rilevare il flip
+  const handleClick = () => {
+    if (completed) return;
+    onClick();
+  };
 
   return (
     <>
+      {/* Audio nascosto */}
+      <audio ref={audioRef} src="/Flip-golden.mp3" preload="auto" />
+
+      {/* Overlay scuro */}
       {enlarged && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-          onClick={onClick}
+          onClick={handleClick}
         />
       )}
 
+      {/* Carta */}
       <motion.div
-        className={`${enlarged ? "fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md h-[60vh] max-h-96" : "w-full aspect-[3/4]"}`}
+        className={`${enlarged 
+          ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[88vw] max-w-xl h-[78vh] max-h-[560px] rounded-3xl shadow-2xl" 
+          : "w-full aspect-[3/4]"}`}
         animate={{ x: enlarged ? "-50%" : "0%", y: enlarged ? "-50%" : "0%" }}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
       >
         <motion.div
           className={`w-full h-full ${completed ? "cursor-not-allowed" : "cursor-pointer"}`}
           style={{ perspective: "1000px" }}
-          onClick={onClick}
-          whileHover={!completed && !enlarged ? { scale: 1.05 } : {}}
+          onClick={handleClick}
+          whileHover={!completed && !enlarged ? { scale: 1.08 } : {}}
           whileTap={!completed ? { scale: 0.98 } : {}}
         >
           <motion.div
             className="w-full h-full relative"
             style={{ transformStyle: "preserve-3d" }}
             animate={{ rotateY: flipped ? 180 : 0 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
           >
             {/* Retro */}
             <div className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden" style={{ backfaceVisibility: "hidden" }}>
