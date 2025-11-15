@@ -77,7 +77,7 @@ export default function App() {
             Flashcards Français
           </h1>
           <p className="text-gray-700 text-sm md:text-base mt-1">
-            Clicca per scoprire!
+            Cliquez pour le découvrir!
           </p>
         </motion.div>
 
@@ -94,7 +94,7 @@ export default function App() {
             className="flex items-center gap-1.5 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow text-sm font-medium hover:bg-white transition"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Ricomincia
+            Recommencer
           </button>
         </div>
 
