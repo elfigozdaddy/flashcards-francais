@@ -3,14 +3,6 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 export default function FlashCard({ card, state, onClick }) {
-  const { flipped, enlarged, completed, flippedPrev } = state;
-  const audioRef = useRef(null);
-
-  // Riproduci audio solo al primo flip (quando si scopre la domanda)
-  useEffect(() => {
-    if (flipped && !flippedPrev && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
     }
   }, [flipped, flippedPrev]);
 
@@ -22,7 +14,7 @@ export default function FlashCard({ card, state, onClick }) {
   return (
     <>
       {/* Audio nascosto */}
-      <audio ref={audioRef} src="/Flip-golden.mp3" preload="auto" />
+      <audio ref={audioRef} src="/Flip-normal.mp3" preload="auto" />   
 
       {/* Overlay scuro quando ingrandita */}
       {enlarged && (
