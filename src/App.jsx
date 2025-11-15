@@ -6,18 +6,18 @@ import FlashCard from "./components/flashcards/FlashCard";
 const cardData = [
   { id: 1, number: 1, question: "Tu as quel âge?", color: "from-pink-400 to-pink-600" },
   { id: 2, number: 2, question: "Comment tu t'appelles?", color: "from-purple-400 to-purple-600" },
-  { id: 3, number: 3, question: "Dire: Salut! et se serrer la main", color: "from-blue-400 to-blue-600" },
-  { id: 4, number: 4, question: "Dire: Coucou! et se taper dans la main!", color: "from-cyan-400 to-cyan-600" },
+  { id: 3, number: 3, question: "Quelle est ta matière préférée?", color: "from-blue-400 to-blue-600" },
+  { id: 4, number: 4, question: "Tu aimes la musique?", color: "from-cyan-400 to-cyan-600" },
   { id: 5, number: 5, question: "Où tu habites?", color: "from-green-400 to-green-600" },
   { id: 6, number: 6, question: "Comment ça va?", color: "from-yellow-400 to-yellow-600" },
   { id: 7, number: 7, question: "Tu es de quelle nationalité?", color: "from-orange-400 to-orange-600" },
-  { id: 8, number: 8, question: "Saluer un ami et se faire la bise", color: "from-red-400 to-red-600" },
+  { id: 8, number: 8, question: "Quelle est ta profession?", color: "from-red-400 to-red-600" },
 ];
 
 export default function App() {
   const [cardStates, setCardStates] = useState(
     cardData.reduce((acc, card) => {
-      acc[card.id] = { flipped: false, enlarged: false, completed: false };
+      acc[card.id] = { flipped: false, enlarged: false, completed: false, flippedPrev: false };
       return acc;
     }, {})
   );
@@ -26,23 +26,22 @@ export default function App() {
     const currentState = cardStates[cardId];
     if (currentState.completed) return;
 
-    if (!currentState.flipped) {
-      setCardStates(prev => ({
-        ...prev,
-        [cardId]: { flipped: true, enlarged: true, completed: false }
-      }));
-    } else if (currentState.enlarged) {
-      setCardStates(prev => ({
-        ...prev,
-        [cardId]: { flipped: true, enlarged: false, completed: true }
-      }));
-    }
+    setCardStates(prev => ({
+      ...prev,
+      [cardId]: {
+        ...prev[cardId],
+        flipped: !prev[cardId].flipped,
+        enlarged: !prev[cardId].flipped,
+        completed: prev[cardId].enlarged,
+        flippedPrev: prev[cardId].flipped
+      }
+    }));
   };
 
   const resetAll = () => {
     setCardStates(
       cardData.reduce((acc, card) => {
-        acc[card.id] = { flipped: false, enlarged: false, completed: false };
+        acc[card.id] = { flipped: false, enlarged: false, completed: false, flippedPrev: false };
         return acc;
       }, {})
     );
@@ -52,84 +51,90 @@ export default function App() {
   const completedCount = Object.values(cardStates).filter(state => state.completed).length;
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="h-screen w-screen overflow-hidden relative flex flex-col bg-gradient-to-b from-sky-100 to-pink-100">
+      {/* Sfondo Parigi (ridotto e fisso) */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
         style={{
           backgroundImage: "url('/Paris-HD.jpg')",
+          backgroundAttachment: "fixed",
         }}
       />
-      
-      <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/70 to-white/80 backdrop-blur-[2px]" />
 
-      <AnimatePresence>
-        {allCompleted && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-          >
-            <h1 
-              className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 drop-shadow-2xl text-center px-8"
-              style={{ fontFamily: "'Comic Sans MS', 'Chalkboard SE', 'Bradley Hand', cursive" }}
-            >
-              Excellent travail!
-            </h1>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Overlay per leggibilità */}
+      <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" />
 
-      <div className="relative z-10 p-6 md:p-12">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4 drop-shadow-lg">
-              Flashcards Français
-            </h1>
-            <p className="text-gray-700 text-lg mb-6 font-medium drop-shadow">
-              Clicca sulle carte per scoprire le domande!
-            </p>
-            
-            <div className="flex items-center justify-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white/50">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="font-semibold text-gray-700">
-                  {completedCount} / {cardData.length} completate
-                </span>
-              </div>
-              
-              <button
-                onClick={resetAll}
-                className="flex items-center gap-2 rounded-full shadow-lg hover:shadow-xl transition-all bg-white/90 backdrop-blur-md border border-white/50 hover:bg-white px-6 py-3 font-medium"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Ricomincia
-              </button>
-            </div>
-          </motion.div>
+      {/* Contenuto principale */}
+      <div className="relative z-10 flex flex-col h-full p-4 md:p-6 max-w-7xl mx-auto w-full">
+        
+        {/* Header compatto */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-3 flex-shrink-0"
+        >
+          <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 drop-shadow-sm">
+            Flashcards Français
+          </h1>
+          <p className="text-gray-700 text-sm md:text-base mt-1">
+            Clicca per scoprire!
+          </p>
+        </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 relative">
-            {cardData.map((card, index) => (
-              <motion.div
-                key={card.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <FlashCard
-                  card={card}
-                  state={cardStates[card.id]}
-                  onClick={() => handleCardClick(card.id)}
-                />
-              </motion.div>
-            ))}
+        {/* Contatore e reset (in fila) */}
+        <div className="flex items-center justify-center gap-3 mb-3 flex-shrink-0 flex-wrap">
+          <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow text-sm">
+            <CheckCircle className="w-4 h-4 text-green-500" />
+            <span className="font-medium text-gray-700">
+              {completedCount} / {cardData.length}
+            </span>
           </div>
+          <button
+            onClick={resetAll}
+            className="flex items-center gap-1.5 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow text-sm font-medium hover:bg-white transition"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Ricomincia
+          </button>
         </div>
+
+        {/* Griglia carte (adattabile) */}
+        <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4 min-h-0">
+          {cardData.map((card, index) => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05 }}
+              className="flex items-center justify-center"
+            >
+              <FlashCard
+                card={card}
+                state={cardStates[card.id] || {}}
+                onClick={() => handleCardClick(card.id)}
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Messaggio finale (sovrapposto) */}
+        <AnimatePresence>
+          {allCompleted && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-4"
+            >
+              <h1 
+                className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 drop-shadow-2xl text-center"
+                style={{ fontFamily: "'Comic Sans MS', cursive" }}
+              >
+                Excellent travail!
+              </h1>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
