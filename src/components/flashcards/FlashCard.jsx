@@ -112,7 +112,7 @@ export default function FlashCard({ card, state, onClick }) {
                     className="absolute bottom-6 left-1/2 -translate-x-1/2"
                   >
                     <div className="bg-white/90 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-full text-sm font-medium shadow-lg">
-                      Clicca per chiudere
+                      cliquez pour fermer
                     </div>
                   </motion.div>
                 )}
