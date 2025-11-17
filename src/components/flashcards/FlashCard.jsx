@@ -6,11 +6,11 @@ export default function FlashCard({ card, state, onClick }) {
   const { flipped, enlarged, completed, flippedPrev } = state;
   const audioRef = useRef(null);
 
-  // Riproduce l’audio solo quando la carta si gira la prima volta
+  // Suona solo quando si scopre la carta la prima volta
   useEffect(() => {
     if (flipped && !flippedPrev && audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {}); // evita errori su alcuni browser/mobile
+      audioRef.current.play().catch(() => {});
     }
   }, [flipped, flippedPrev]);
 
@@ -21,7 +21,6 @@ export default function FlashCard({ card, state, onClick }) {
 
   return (
     <>
-      {/* Audio nascosto */}
       <audio ref={audioRef} src="/Flip-golden.mp3" preload="auto" />
 
       {/* Overlay scuro */}
@@ -45,7 +44,7 @@ export default function FlashCard({ card, state, onClick }) {
         transition={{ duration: 0.5, ease: "easeInOut" }}
       >
         <motion.div
-          className={`w-full h-full ${completed ? "cursor-not-allowed" : "cursor-pointer"} select-none`}
+          className={`w-full h-full ${completed ? "cursor-default" : "cursor-pointer"} select-none`}
           style={{ perspective: "1000px" }}
           onClick={handleClick}
           whileHover={!completed && !enlarged ? { scale: 1.08 } : {}}
@@ -57,8 +56,11 @@ export default function FlashCard({ card, state, onClick }) {
             animate={{ rotateY: flipped ? 180 : 0 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           >
-            {/* Retro */}
-            <div className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden" style={{ backfaceVisibility: "hidden" }}>
+            {/* Retro - visibile solo se NON flipped */}
+            <div
+              className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden"
+              style={{ backfaceVisibility: "hidden" }}
+            >
               <div className={`w-full h-full bg-gradient-to-br ${card.color} flex items-center justify-center relative`}>
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute top-4 left-4 w-16 h-16 border-4 border-white rounded-full" />
@@ -67,8 +69,10 @@ export default function FlashCard({ card, state, onClick }) {
                 <div className="text-8xl md:text-9xl font-black text-white drop-shadow-2xl">
                   {card.number}
                 </div>
-                {completed && (
-                  <div className="absolute top-4 right-4 rounded-full shadow-lg overflow-hidden w-12 h-12">
+
+                {/* Timbro sulla carta piccola (solo se completed e non ingrandita) */}
+                {completed && !enlarged && (
+                  <div className="absolute top-2 right-2 rounded-full shadow-lg overflow-hidden w-10 h-10 border-2 border-white">
                     <div className="w-full h-full flex">
                       <div className="w-1/3 bg-[#0055A4]" />
                       <div className="w-1/3 bg-white flex items-center justify-center">
@@ -81,10 +85,13 @@ export default function FlashCard({ card, state, onClick }) {
               </div>
             </div>
 
-            {/* Fronte */}
-            <div className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
-              <div className={`w-full h-full bg-gradient-to-br ${card.color} flex items-center justify-center p-6 md:p-8 relative`}>
-                <div className="absolute inset-0 opacity-10">
+            {/* Fronte - sempre visibile quando flipped */}
+            <div
+              className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden"
+              style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+            >
+              <div className={`w-full h-full bg-gradient-to-br ${card.color} flex flex-col items-center justify-center p-4 md:p-8 relative`}>
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                       <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -95,21 +102,25 @@ export default function FlashCard({ card, state, onClick }) {
                   </svg>
                 </div>
 
-                <div className="text-center">
-                  <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-1 mb-4">
-                    <span className="text-white text-sm font-semibold">Question {card.number}</span>
+                {/* Domanda (adattabile) */}
+                <div className="text-center z-10">
+                  <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 mb-3 text-xs md:text-sm">
+                    <span className="text-white font-semibold">Question {card.number}</span>
                   </div>
-                  <h2 className={`font-bold text-white drop-shadow-lg leading-tight ${enlarged ? "text-3xl md:text-4xl" : "text-lg md:text-xl"}`}>
+                  <h2 className={`font-bold text-white drop-shadow-lg leading-tight ${
+                    enlarged ? "text-3xl md:text-4xl" : "text-sm md:text-lg"
+                  }`}>
                     {card.question}
                   </h2>
                 </div>
 
+                {/* "cliquez pour fermer" */}
                 {enlarged && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2"
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
                   >
                     <div className="bg-white/90 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-full text-sm font-medium shadow-lg">
                       cliquez pour fermer
@@ -117,12 +128,13 @@ export default function FlashCard({ card, state, onClick }) {
                   </motion.div>
                 )}
 
+                {/* Timbro grande quando ingrandita, piccolo quando nella griglia */}
                 {completed && (
-                  <div className="absolute top-4 right-4 rounded-full shadow-lg overflow-hidden w-12 h-12">
+                  <div className={`absolute ${enlarged ? "top-6 right-6 w-16 h-16" : "top-2 right-2 w-10 h-10"} rounded-full shadow-lg overflow-hidden border-4 border-white z-10`}>
                     <div className="w-full h-full flex">
                       <div className="w-1/3 bg-[#0055A4]" />
                       <div className="w-1/3 bg-white flex items-center justify-center">
-                        <Check className="w-5 h-5 text-[#EF4135]" strokeWidth={3} />
+                        <Check className={`${enlarged ? "w-8 h-8" : "w-5 h-5"} text-[#EF4135]`} strokeWidth={4} />
                       </div>
                       <div className="w-1/3 bg-[#EF4135]" />
                     </div>
