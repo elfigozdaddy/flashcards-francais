@@ -3,6 +3,14 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 
 export default function FlashCard({ card, state, onClick }) {
+  const { flipped, enlarged, completed, flippedPrev } = state;
+  const audioRef = useRef(null);
+
+  // Riproduce l’audio solo quando la carta si gira la prima volta
+  useEffect(() => {
+    if (flipped && !flippedPrev && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {}); // evita errori su alcuni browser/mobile
     }
   }, [flipped, flippedPrev]);
 
@@ -14,9 +22,9 @@ export default function FlashCard({ card, state, onClick }) {
   return (
     <>
       {/* Audio nascosto */}
-      <audio ref={audioRef} src="/Flip-normal.mp3" preload="auto" />   
+      <audio ref={audioRef} src="/Flip-golden.mp3" preload="auto" />
 
-      {/* Overlay scuro quando ingrandita */}
+      {/* Overlay scuro */}
       {enlarged && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -33,14 +41,11 @@ export default function FlashCard({ card, state, onClick }) {
           ? "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[92vw] max-w-md h-[70vh] max-h-[500px] rounded-3xl shadow-2xl overflow-hidden"
           : "w-full h-full"
         }`}
-        animate={{
-          x: enlarged ? "-50%" : "0%",
-          y: enlarged ? "-50%" : "0%"
-        }}
+        animate={{ x: enlarged ? "-50%" : "0%", y: enlarged ? "-50%" : "0%" }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
       >
         <motion.div
-          className={`w-full h-full ${completed ? "cursor-not-allowed" : "cursor-pointer"}`}
+          className={`w-full h-full ${completed ? "cursor-not-allowed" : "cursor-pointer"} select-none`}
           style={{ perspective: "1000px" }}
           onClick={handleClick}
           whileHover={!completed && !enlarged ? { scale: 1.08 } : {}}
@@ -52,11 +57,8 @@ export default function FlashCard({ card, state, onClick }) {
             animate={{ rotateY: flipped ? 180 : 0 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           >
-            {/* Retro della carta (numero) */}
-            <div
-              className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden"
-              style={{ backfaceVisibility: "hidden" }}
-            >
+            {/* Retro */}
+            <div className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden" style={{ backfaceVisibility: "hidden" }}>
               <div className={`w-full h-full bg-gradient-to-br ${card.color} flex items-center justify-center relative`}>
                 <div className="absolute inset-0 opacity-10">
                   <div className="absolute top-4 left-4 w-16 h-16 border-4 border-white rounded-full" />
@@ -79,11 +81,8 @@ export default function FlashCard({ card, state, onClick }) {
               </div>
             </div>
 
-            {/* Fronte della carta (domanda) */}
-            <div
-              className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden"
-              style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-            >
+            {/* Fronte */}
+            <div className="absolute inset-0 rounded-2xl shadow-2xl overflow-hidden" style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
               <div className={`w-full h-full bg-gradient-to-br ${card.color} flex items-center justify-center p-6 md:p-8 relative`}>
                 <div className="absolute inset-0 opacity-10">
                   <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -105,7 +104,6 @@ export default function FlashCard({ card, state, onClick }) {
                   </h2>
                 </div>
 
-                {/* Indicatore chiusura */}
                 {enlarged && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
@@ -119,7 +117,6 @@ export default function FlashCard({ card, state, onClick }) {
                   </motion.div>
                 )}
 
-                {/* Bandiera completata */}
                 {completed && (
                   <div className="absolute top-4 right-4 rounded-full shadow-lg overflow-hidden w-12 h-12">
                     <div className="w-full h-full flex">
