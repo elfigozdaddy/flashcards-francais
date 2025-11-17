@@ -74,7 +74,7 @@ export default function App() {
           className="text-center mb-3 flex-shrink-0"
         >
           <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 drop-shadow-sm">
-            Flashcards Français
+            Se saluer et se présenter
           </h1>
           <p className="text-gray-700 text-sm md:text-base mt-1">
             Cliquez pour le découvrir!
