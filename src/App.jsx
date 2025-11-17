@@ -6,12 +6,12 @@ import FlashCard from "./components/flashcards/FlashCard";
 const cardData = [
   { id: 1, number: 1, question: "Tu as quel âge?", color: "from-pink-400 to-pink-600" },
   { id: 2, number: 2, question: "Comment tu t'appelles?", color: "from-purple-400 to-purple-600" },
-  { id: 3, number: 3, question: "Quelle est ta matière préférée?", color: "from-blue-400 to-blue-600" },
-  { id: 4, number: 4, question: "Tu aimes la musique?", color: "from-cyan-400 to-cyan-600" },
+  { id: 3, number: 3, question: "Dire: Salut! et se serrer la main", color: "from-blue-400 to-blue-600" },
+  { id: 4, number: 4, question: "Dire: Coucou! et se taper dans la main!", color: "from-cyan-400 to-cyan-600" },
   { id: 5, number: 5, question: "Où tu habites?", color: "from-green-400 to-green-600" },
   { id: 6, number: 6, question: "Comment ça va?", color: "from-yellow-400 to-yellow-600" },
   { id: 7, number: 7, question: "Tu es de quelle nationalité?", color: "from-orange-400 to-orange-600" },
-  { id: 8, number: 8, question: "Quelle est ta profession?", color: "from-red-400 to-red-600" },
+  { id: 8, number: 8, question: "Saluer un ami et se faire la bise", color: "from-red-400 to-red-600" },
 ];
 
 export default function App() {
