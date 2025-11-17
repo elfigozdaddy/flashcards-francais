@@ -72,7 +72,7 @@ export default function FlashCard({ card, state, onClick }) {
 
                 {/* Timbro sulla carta piccola (solo se completed e non ingrandita) */}
                 {completed && !enlarged && (
-                  <div className="absolute top-2 right-2 rounded-full shadow-lg overflow-hidden w-10 h-10 border-2 border-white">
+                  <div className="absolute top-2 right-2 rounded-full shadow-lg overflow-hidden w-16 h-16 border-2 border-white">
                     <div className="w-full h-full flex">
                       <div className="w-1/3 bg-[#0055A4]" />
                       <div className="w-1/3 bg-white flex items-center justify-center">
