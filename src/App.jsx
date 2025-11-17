@@ -17,25 +17,46 @@ const cardData = [
 export default function App() {
   const [cardStates, setCardStates] = useState(
     cardData.reduce((acc, card) => {
-      acc[card.id] = { flipped: false, enlarged: false, completed: false, flippedPrev: false };
+      acc[card.id] = {
+        flipped: false,      // se è girata o no
+        enlarged: false,     // se è ingrandita o no
+        completed: false,    // se è stata completata
+        flippedPrev: false   // per far suonare l’audio solo la prima volta
+      };
       return acc;
     }, {})
   );
 
   const handleCardClick = (cardId) => {
-    const currentState = cardStates[cardId];
-    if (currentState.completed) return;
+    const current = cardStates[cardId];
 
-    setCardStates(prev => ({
-      ...prev,
-      [cardId]: {
-        ...prev[cardId],
-        flipped: !prev[cardId].flipped,
-        enlarged: !prev[cardId].flipped,
-        completed: prev[cardId].enlarged,
-        flippedPrev: prev[cardId].flipped
-      }
-    }));
+    // Se è già completata non fare nulla
+    if (current.completed) return;
+
+    // PRIMO CLICK → si gira e si ingrandisce
+    if (!current.flipped) {
+      setCardStates(prev => ({
+        ...prev,
+        [cardId]: {
+          ...prev[cardId],
+          flipped: true,       // resta scoperta per sempre
+          enlarged: true,
+          flippedPrev: false
+        }
+      }));
+    }
+    // SECONDO CLICK → torna piccola ma resta scoperta e diventa completed
+    else if (current.enlarged) {
+      setCardStates(prev => ({
+        ...prev,
+        [cardId]: {
+          ...prev[cardId],
+          enlarged: false,
+          completed: true,
+          flippedPrev: true
+        }
+      }));
+    }
   };
 
   const resetAll = () => {
@@ -52,7 +73,7 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen overflow-hidden relative flex flex-col bg-gradient-to-b from-sky-100 to-pink-100">
-      {/* Sfondo Parigi (ridotto e fisso) */}
+      {/* Sfondo Parigi */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
         style={{
@@ -61,18 +82,11 @@ export default function App() {
         }}
       />
 
-      {/* Overlay per leggibilità */}
       <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" />
 
-      {/* Contenuto principale */}
       <div className="relative z-10 flex flex-col h-full p-4 md:p-6 max-w-7xl mx-auto w-full">
         
-        {/* Header compatto */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-3 flex-shrink-0"
-        >
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-3 flex-shrink-0">
           <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 drop-shadow-sm">
             Se saluer et se présenter
           </h1>
@@ -81,7 +95,6 @@ export default function App() {
           </p>
         </motion.div>
 
-        {/* Contatore e reset (in fila) */}
         <div className="flex items-center justify-center gap-3 mb-3 flex-shrink-0 flex-wrap">
           <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow text-sm">
             <CheckCircle className="w-4 h-4 text-green-500" />
@@ -98,7 +111,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* Griglia carte (adattabile) */}
         <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-4 min-h-0">
           {cardData.map((card, index) => (
             <motion.div
@@ -117,7 +129,6 @@ export default function App() {
           ))}
         </div>
 
-        {/* Messaggio finale (sovrapposto) */}
         <AnimatePresence>
           {allCompleted && (
             <motion.div
